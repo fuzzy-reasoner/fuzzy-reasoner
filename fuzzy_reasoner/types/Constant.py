@@ -1,10 +1,9 @@
 from dataclasses import dataclass
-from typing import Optional
-import numpy as np
+from typing import Optional, Any
 from numpy.typing import NDArray
 
 
-@dataclass
+@dataclass(frozen=True, eq=False)
 class Constant:
     symbol: str
-    vector: Optional[NDArray[np.float32]]
+    vector: Optional[NDArray[Any]] = None

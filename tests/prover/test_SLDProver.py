@@ -1,5 +1,4 @@
 from fuzzy_reasoner.prover.SLDProver import SLDProver
-from fuzzy_reasoner.types.Atom import Atom
 from fuzzy_reasoner.types.Constant import Constant
 from fuzzy_reasoner.types.Rule import Rule
 from fuzzy_reasoner.types.Variable import Variable
@@ -25,27 +24,27 @@ def test_basic_proof_without_fuzzy_unification() -> None:
 
     rules = {
         # base facts
-        Rule(parent_of([homer, bart])),
-        Rule(parent_of([marge, bart])),
-        Rule(parent_of([abe, homer])),
-        Rule(parent_of([mona, homer])),
-        Rule(is_male([homer])),
-        Rule(is_male([abe])),
-        Rule(is_male([bart])),
-        Rule(is_female([marge])),
-        Rule(is_female([mona])),
+        Rule(parent_of(homer, bart)),
+        Rule(parent_of(marge, bart)),
+        Rule(parent_of(abe, homer)),
+        Rule(parent_of(mona, homer)),
+        Rule(is_male(homer)),
+        Rule(is_male(abe)),
+        Rule(is_male(bart)),
+        Rule(is_female(marge)),
+        Rule(is_female(mona)),
         # theorems
-        Rule(father_of([X, Y]), [parent_of([X, Y]), is_male([X])]),
-        Rule(mother_of([X, Y]), [parent_of([X, Y]), is_male([X])]),
-        Rule(grandpa_of([X, Y]), [father_of([X, Z]), parent_of([Z, X])]),
-        Rule(grandma_of([X, Y]), [mother_of([X, Z]), parent_of([Z, X])]),
+        Rule(father_of(X, Y), (parent_of(X, Y), is_male(X))),
+        Rule(mother_of(X, Y), (parent_of(X, Y), is_male(X))),
+        Rule(grandpa_of(X, Y), (father_of(X, Z), parent_of(Z, X))),
+        Rule(grandma_of(X, Y), (mother_of(X, Z), parent_of(Z, X))),
     }
 
     prover = SLDProver(rules=rules)
 
-    result = prover.prove(grandpa_of([abe, bart]))
+    result = prover.prove(grandpa_of((abe, bart)))
     assert result is not None
 
     # should not be able to prove things that are false
-    assert prover.prove(grandpa_of([mona, bart])) is None
-    assert prover.prove(grandpa_of([bart, abe])) is None
+    assert prover.prove(grandpa_of((mona, bart))) is None
+    assert prover.prove(grandpa_of((bart, abe))) is None

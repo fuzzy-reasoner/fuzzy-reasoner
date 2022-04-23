@@ -1,10 +1,15 @@
+from __future__ import annotations
 from dataclasses import dataclass
-from typing import List
+from typing import Optional
 
 from .Atom import Atom
 
 
-@dataclass
+@dataclass(frozen=True, eq=False)
 class Rule:
-    Head: Atom
-    Body: List[Atom]
+    head: Atom
+    body: Optional[tuple[Atom]] = None
+
+    def __str__(self) -> str:
+        body_str = ", ".join([atom.__str__() for atom in self.body or []])
+        return f"{self.head} :- {body_str}"

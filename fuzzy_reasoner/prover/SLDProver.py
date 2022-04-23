@@ -1,4 +1,5 @@
-from typing import Sequence, Set, Union
+from __future__ import annotations
+from typing import Sequence, Set
 
 from fuzzy_reasoner.types.Atom import Atom
 from fuzzy_reasoner.types.ProofGraph import ProofGraph
@@ -20,7 +21,5 @@ class SLDProver:
         self.min_similarity_threshold = min_similarity_threshold
         self.rules = set(rules)
 
-    def prove(
-        goal: Atom, dynamic_rules: Sequence[Rule] = []
-    ) -> Union[ProofGraph, None]:
+    def prove(goal: Atom, dynamic_rules: Sequence[Rule] = []) -> ProofGraph | None:
         pass

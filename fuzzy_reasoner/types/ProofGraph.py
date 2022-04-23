@@ -1,17 +1,17 @@
+from __future__ import annotations
 from dataclasses import dataclass
-from typing import List
 
 from .Rule import Rule
 from .Atom import Atom
 
 
-@dataclass
+@dataclass(frozen=True, eq=False)
 class ProofGraphNode:
     rule: Rule
-    children: List["ProofGraphNode"]
+    children: tuple[ProofGraphNode]
 
 
-@dataclass
+@dataclass(frozen=True, eq=False)
 class ProofGraph:
     goal: Atom
     steps: ProofGraphNode

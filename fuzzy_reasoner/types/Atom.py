@@ -1,12 +1,12 @@
+from __future__ import annotations
 from dataclasses import dataclass
-from typing import List, Union
 
 from .Variable import Variable
 from .Constant import Constant
 from .Predicate import Predicate
 
 
-@dataclass
+@dataclass(frozen=True, eq=False)
 class Atom:
     predicate: Predicate
-    terms: List[Union[Constant, Variable]]
+    terms: tuple[Constant | Variable]
