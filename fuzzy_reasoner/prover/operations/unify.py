@@ -5,6 +5,7 @@ from numpy.typing import NDArray
 from fuzzy_reasoner.prover.Goal import Goal
 
 from fuzzy_reasoner.prover.ProofState import ProofState, SubstitutionsMap
+from fuzzy_reasoner.similarity import SimilarityFunc
 from fuzzy_reasoner.types.Constant import Constant
 from fuzzy_reasoner.types.Predicate import Predicate
 from fuzzy_reasoner.types.Rule import Rule
@@ -83,7 +84,7 @@ def unify(
     rule: Rule,
     goal: Goal,
     proof_state: ProofState,
-    similarity_func: Optional[Callable[[NDArray[Any], NDArray[Any]], float]] = None,
+    similarity_func: Optional[SimilarityFunc] = None,
     min_similarity_threshold: float = 0.5,
 ) -> tuple[SubstitutionsMap, float] | None:
     """
@@ -98,13 +99,11 @@ def unify(
     """
     head = rule.head
     substitutions = proof_state.substitutions
-    similarity = proof_state.similarity
     if len(head.terms) != len(goal.statement.terms):
         return None
 
-    similarity = min(
-        similarity,
-        calc_similarity(head.predicate, goal.statement.predicate, similarity_func),
+    similarity = calc_similarity(
+        head.predicate, goal.statement.predicate, similarity_func
     )
 
     # abort early if the predicate similarity is too low
