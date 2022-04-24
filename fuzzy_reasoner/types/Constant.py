@@ -7,3 +7,6 @@ from numpy.typing import NDArray
 class Constant:
     symbol: str
     vector: Optional[NDArray[Any]] = None
+
+    def __str__(self) -> str:
+        return f"CONST:{self.symbol}"

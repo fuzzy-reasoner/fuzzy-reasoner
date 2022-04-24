@@ -9,3 +9,6 @@ from fuzzy_reasoner.types.Rule import Rule
 class Goal:
     statement: Atom
     scope: Rule
+
+    def __str__(self) -> str:
+        return f"GOAL:{self.statement}"

@@ -4,11 +4,11 @@ from typing import Optional
 from fuzzy_reasoner.prover.Goal import Goal
 from fuzzy_reasoner.prover.ProofState import ProofState
 from fuzzy_reasoner.prover.operations.unify import unify
-from fuzzy_reasoner.similarity import SimilarityFunc
-from fuzzy_reasoner.types.ProofGraph import (
+from fuzzy_reasoner.prover.ProofGraph import (
     ProofGraphUnificationNode,
     ProofGraphConjunctionNode,
 )
+from fuzzy_reasoner.similarity import SimilarityFunc
 
 
 def recurse(
@@ -16,7 +16,7 @@ def recurse(
     max_depth: int,
     proof_state: ProofState,
     similarity_func: Optional[SimilarityFunc],
-    min_similarity_threshold: int,
+    min_similarity_threshold: float,
 ) -> tuple[list[ProofState], list[ProofGraphUnificationNode]]:
     """
     Operation corresponding to OR from "end-to-end differentiable proving"
@@ -62,10 +62,11 @@ def recurse(
             ):
                 graph_nodes.append(
                     ProofGraphUnificationNode(
-                        goal,
+                        goal.statement,
                         rule,
                         unification_similarity=similarity,
                         overall_similarity=child_proof_state.similarity,
+                        substitutions=child_proof_state.substitutions,
                         child=child_node,
                     )
                 )
@@ -73,10 +74,11 @@ def recurse(
             next_proof_states.append(next_proof_state)
             graph_nodes.append(
                 ProofGraphUnificationNode(
-                    goal,
+                    goal.statement,
                     rule,
                     unification_similarity=similarity,
                     overall_similarity=overall_similarity,
+                    substitutions=substitutions,
                 )
             )
     return next_proof_states, graph_nodes
@@ -87,7 +89,7 @@ def join(
     max_depth: int,
     proof_state: ProofState,
     similarity_func: Optional[SimilarityFunc],
-    min_similarity_threshold: int,
+    min_similarity_threshold: float,
 ) -> tuple[list[ProofState], list[ProofGraphConjunctionNode]]:
     """
     Operation corresponding to AND from "end-to-end differentiable proving"
@@ -115,7 +117,9 @@ def join(
     # no more goals to prove, so every successful proof of the main goal is sufficient
     if len(remaining_goals) == 0:
         conjunction_nodes = [
-            ProofGraphConjunctionNode(goals, children=[node])
+            ProofGraphConjunctionNode(
+                tuple(goal.statement for goal in goals), children=(node,)
+            )
             for node in recursed_graph_nodes
         ]
         return recursed_proof_states, conjunction_nodes
@@ -134,7 +138,8 @@ def join(
         proof_states += joined_proof_states
         conjunction_nodes += [
             ProofGraphConjunctionNode(
-                goals, children=[recursed_graph_node, *node.chidlren]
+                tuple(goal.statement for goal in goals),
+                children=(recursed_graph_node, *node.children),
             )
             for node in joined_graph_nodes
         ]

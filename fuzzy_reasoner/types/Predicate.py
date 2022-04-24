@@ -23,3 +23,6 @@ class Predicate:
         from .Atom import Atom
 
         return Atom(self, terms)
+
+    def __str__(self) -> str:
+        return f"PRED:{self.symbol}"

@@ -1,14 +1,11 @@
 from immutables import Map
 import numpy as np
-import pytest
+import pytest  # type: ignore
 from fuzzy_reasoner.prover.Goal import Goal
-from fuzzy_reasoner.prover.ProofState import ProofState, SubstitutionsMap
+from fuzzy_reasoner.prover.ProofState import ProofState
 
 from fuzzy_reasoner.prover.operations.unify import (
-    VariableBindingError,
     calc_similarity,
-    get_var_binding,
-    set_var_binding,
     unify,
 )
 from fuzzy_reasoner.similarity import cosine_similarity
@@ -55,79 +52,6 @@ def test_calc_similarity_compares_symbols_if_either_const_is_missing_a_vector() 
     ) == pytest.approx(1.0)
 
 
-# -- get_var_binding helper --
-
-
-def test_get_var_binding_recursively_resolves_dependencies() -> None:
-    predicate = Predicate("is")
-    const1 = Constant("jared")
-    const2 = Constant("mark")
-    var1 = Variable("X")
-    var2 = Variable("Y")
-    rule1 = Rule(predicate(const1))
-    rule2 = Rule(predicate(const2))
-    subs: SubstitutionsMap = Map(
-        {
-            rule1: Map({var1: const1, var2: (rule2, var1)}),
-            rule2: Map({var2: (rule1, var1)}),
-        }
-    )
-    assert get_var_binding(var1, rule1, subs) == const1
-    assert get_var_binding(var2, rule1, subs) is None
-    assert get_var_binding(var2, rule2, subs) == const1
-
-
-# -- set_var_binding helper --
-
-
-def test_set_var_binding_can_set_var_to_another_var() -> None:
-    predicate = Predicate("is")
-    const1 = Constant("jared")
-    var1 = Variable("X")
-    var2 = Variable("Y")
-    rule1 = Rule(predicate(const1))
-    subs: SubstitutionsMap = Map()
-
-    new_subs = set_var_binding(var1, rule1, (rule1, var2), subs)
-
-    # should recursively find the first referenced var and set its subtitution
-    assert new_subs[rule1][var1] == (rule1, var2)
-
-
-def test_set_var_binding_recursively_resolves_dependencies() -> None:
-    predicate = Predicate("is")
-    const1 = Constant("jared")
-    const2 = Constant("mark")
-    var1 = Variable("X")
-    var2 = Variable("Y")
-    rule1 = Rule(predicate(const1))
-    rule2 = Rule(predicate(const2))
-    subs: SubstitutionsMap = Map(
-        {
-            rule1: Map({var1: const1, var2: (rule2, var1)}),
-            rule2: Map({var2: (rule1, var1)}),
-        }
-    )
-
-    new_subs = set_var_binding(var1, rule2, const2, subs)
-
-    # should recursively find the first referenced var and set its subtitution
-    assert new_subs[rule2][var1] == const2
-    assert get_var_binding(var1, rule2, new_subs) == const2
-
-
-def test_set_var_binding_raises_exception_when_binding_already_bound_var() -> None:
-    predicate = Predicate("is")
-    const1 = Constant("jared")
-    var1 = Variable("X")
-    var2 = Variable("Y")
-    rule1 = Rule(predicate(const1))
-    subs: SubstitutionsMap = Map({rule1: Map({var1: const1})})
-
-    with pytest.raises(VariableBindingError):
-        set_var_binding(var1, rule1, (rule1, var2), subs)
-
-
 # -- unify --
 
 
@@ -150,7 +74,7 @@ def test_unify_returns_new_substitution_map_and_similarity_on_success() -> None:
     )
     assert result is not None
     assert result[0] == Map({rule1: Map({X: fluffy})})
-    assert result[1] == 0.9
+    assert result[1] == 1.0
 
 
 def test_unify_fails_if_similarity_is_below_threshold() -> None:
