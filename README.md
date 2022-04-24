@@ -1,4 +1,6 @@
 # Fuzzy Reasoner
+![example workflow](https://github.com/chanind/fuzzy-reasoner/actions/workflows/ci.yaml/badge.svg)
+
 
 A simple symbolic reasoner which allows fuzzy unification based on embedding comparisons.
 
