@@ -16,5 +16,7 @@ jobs:
         run: poetry run flake8 .
       - name: black code formatting
         run: poetry run black . --check
+      - name: mypy type checking
+        run: poetry run mypy .
       - name: pytest
         run: poetry run pytest
