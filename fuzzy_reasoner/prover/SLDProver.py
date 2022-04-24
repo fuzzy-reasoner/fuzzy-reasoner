@@ -14,6 +14,7 @@ class SLDProver:
     max_proof_depth: int
     min_similarity_threshold: float
     rules: frozenset[Rule]
+    # MyPy freaks out if this isn't optional, see https://github.com/python/mypy/issues/708
     similarity_func: Optional[SimilarityFunc]
 
     def __init__(
@@ -25,8 +26,8 @@ class SLDProver:
     ) -> None:
         self.max_proof_depth = max_proof_depth
         self.min_similarity_threshold = min_similarity_threshold
-        self.rules = frozenset(rules)
         self.similarity_func = similarity_func
+        self.rules = frozenset(rules)
 
     def prove(
         self, goal: Goal | Atom, dynamic_rules: Optional[Sequence[Rule]] = None

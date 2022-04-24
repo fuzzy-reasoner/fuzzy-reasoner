@@ -10,21 +10,11 @@ from fuzzy_reasoner.prover.operations.substitution import (
     set_var_binding,
     SubstitutionsMap,
 )
-from fuzzy_reasoner.similarity import SimilarityFunc
+from fuzzy_reasoner.similarity import SimilarityFunc, symbol_compare
 from fuzzy_reasoner.types.Constant import Constant
 from fuzzy_reasoner.types.Predicate import Predicate
 from fuzzy_reasoner.types.Rule import Rule
 from fuzzy_reasoner.types.Variable import Variable
-
-
-def calc_similarity(
-    item1: Constant | Predicate,
-    item2: Constant | Predicate,
-    similarity_func: Optional[Callable[[NDArray[Any], NDArray[Any]], float]],
-) -> float:
-    if similarity_func is None or item1.vector is None or item2.vector is None:
-        return 1.0 if item1.symbol == item2.symbol else 0.0
-    return similarity_func(item1.vector, item2.vector)
 
 
 def unify(
@@ -49,9 +39,9 @@ def unify(
     if len(head.terms) != len(goal.statement.terms):
         return None
 
-    similarity = calc_similarity(
-        head.predicate, goal.statement.predicate, similarity_func
-    )
+    # if there is no comparison function provided, just use symbol compare (non-fuzzy comparisons)
+    adjusted_similarity_func = similarity_func or symbol_compare
+    similarity = adjusted_similarity_func(head.predicate, goal.statement.predicate)
 
     # abort early if the predicate similarity is too low
     if similarity < min_similarity_threshold:
@@ -84,9 +74,7 @@ def unify(
         else:
             similarity = min(
                 similarity,
-                calc_similarity(
-                    head_term_resolution, goal_term_resolution, similarity_func
-                ),
+                adjusted_similarity_func(head_term_resolution, goal_term_resolution),
             )
             # abort early if the predicate similarity is too low
             if similarity < min_similarity_threshold:
