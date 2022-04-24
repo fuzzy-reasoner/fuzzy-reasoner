@@ -1,6 +1,5 @@
 from __future__ import annotations
-from typing import Callable, Any, Optional
-from numpy.typing import NDArray
+from typing import Optional
 from fuzzy_reasoner.prover.Goal import Goal
 
 from fuzzy_reasoner.prover.ProofState import ProofState
@@ -12,7 +11,6 @@ from fuzzy_reasoner.prover.operations.substitution import (
 )
 from fuzzy_reasoner.similarity import SimilarityFunc, symbol_compare
 from fuzzy_reasoner.types.Constant import Constant
-from fuzzy_reasoner.types.Predicate import Predicate
 from fuzzy_reasoner.types.Rule import Rule
 from fuzzy_reasoner.types.Variable import Variable
 
