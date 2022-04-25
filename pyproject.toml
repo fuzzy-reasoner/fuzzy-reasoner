@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fuzzy-reasoner"
-version = "0.1.0"
+version = "0.1.1"
 description = "Simple symbolic reasoner which supports fuzzy unification"
 license = "MIT"
 readme = "README.md"
