@@ -1,8 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Optional
 from immutables import Map
-from fuzzy_reasoner.prover.Goal import Goal
 from fuzzy_reasoner.prover.operations.substitution import SubstitutionsMap
 
 from fuzzy_reasoner.types.Rule import Rule

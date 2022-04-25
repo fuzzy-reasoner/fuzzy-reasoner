@@ -2,7 +2,6 @@ from __future__ import annotations
 from typing import Optional
 from fuzzy_reasoner.prover.Goal import Goal
 
-from fuzzy_reasoner.prover.ProofState import ProofState
 from fuzzy_reasoner.prover.operations.substitution import (
     is_var_bound,
     resolve_term,
