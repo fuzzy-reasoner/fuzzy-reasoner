@@ -10,7 +10,6 @@ from fuzzy_reasoner.types.Rule import Rule
 
 @dataclass
 class ProofState:
-    prev_goal: Optional[Goal] = None
     similarity: float = 1.0
     substitutions: SubstitutionsMap = Map()
     # TODO: allow re-using rules, find another way to avoid cycles in the proof graph
