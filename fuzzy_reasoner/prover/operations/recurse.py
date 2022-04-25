@@ -28,7 +28,7 @@ def recurse(
         unify_result = unify(
             rule,
             goal,
-            proof_state,
+            proof_state.substitutions,
             similarity_func=similarity_func,
             min_similarity_threshold=min_similarity_threshold,
         )
@@ -38,7 +38,6 @@ def recurse(
         substitutions, similarity = unify_result
         overall_similarity = min(similarity, proof_state.similarity)
         next_proof_state = ProofState(
-            goal,
             similarity=overall_similarity,
             substitutions=substitutions,
             available_rules=proof_state.available_rules.difference([rule]),

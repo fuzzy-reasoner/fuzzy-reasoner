@@ -2,7 +2,6 @@ from immutables import Map
 import numpy as np
 import pytest  # type: ignore
 from fuzzy_reasoner.prover.Goal import Goal
-from fuzzy_reasoner.prover.ProofState import ProofState
 
 from fuzzy_reasoner.prover.operations.unify import (
     unify,
@@ -27,7 +26,7 @@ def test_unify_returns_new_substitution_map_and_similarity_on_success() -> None:
     result = unify(
         rule2,
         goal,
-        ProofState(similarity=0.9),
+        Map(),
         similarity_func=cosine_similarity,
         min_similarity_threshold=0.5,
     )
@@ -51,7 +50,7 @@ def test_unify_fails_if_similarity_is_below_threshold() -> None:
         unify(
             rule2,
             goal,
-            ProofState(similarity=1.0),
+            Map(),
             similarity_func=cosine_similarity,
             min_similarity_threshold=0.9,
         )
@@ -75,7 +74,7 @@ def test_unify_fails_if_the_terms_are_different_lengths() -> None:
         unify(
             rule2,
             goal,
-            ProofState(similarity=1.0),
+            Map(),
             similarity_func=cosine_similarity,
             min_similarity_threshold=0.1,
         )
@@ -97,7 +96,7 @@ def test_unify_uses_the_min_similarity_of_all_unified_items() -> None:
     result = unify(
         rule2,
         goal,
-        ProofState(similarity=0.9),
+        Map(),
         similarity_func=cosine_similarity,
         min_similarity_threshold=0.1,
     )
