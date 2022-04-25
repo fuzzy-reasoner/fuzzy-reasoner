@@ -41,17 +41,14 @@ from fuzzy_reasoner import SLDProver, Atom, Rule, Constant, Predicate, Variable
 X = Variable("X")
 Y = Variable("Y")
 Z = Variable("Z")
-# each predicate can be assigned an embedding array for fuzzy comparisons
-# the SLDReasoner allow predicates and constants to be unified if their embeddings are similar
-grandpa_of = Predicate("grandpa_of", np.array[1.0, 1.0, 0.0, 0.3, ...])
-grandfather_of = Predicate("grandfather_of", np.array[1.01, 0.95, 0.05, 0.33, ...])
-parent_of = Predicate("parent_of", np.array[ ... ])
-father_of = Predicate("father_of", np.array[ ... ])
-
-# constants can also be given an embedding for fuzzy unification
-bart = Constant("bart", np.array[ ... ])
-homer = Constant("homer", np.array[ ... ])
-abe = Constant("abe", np.array[ ... ])
+# predicates and constants can be given an embedding array for fuzzy unification
+grandpa_of = Predicate("grandpa_of", np.array([1.0, 1.0, 0.0, 0.3, ...]))
+grandfather_of = Predicate("grandfather_of", np.array([1.01, 0.95, 0.05, 0.33, ...]))
+parent_of = Predicate("parent_of", np.array([ ... ]))
+father_of = Predicate("father_of", np.array([ ... ]))
+bart = Constant("bart", np.array([ ... ]))
+homer = Constant("homer", np.array([ ... ]))
+abe = Constant("abe", np.array([ ... ]))
 
 rules = [
     # base facts
@@ -79,7 +76,7 @@ print(failed_proof) # None
 If you don't want to use fuzzy unification, you can just not pass in an embedding array when creating a `Predicate` or `Constant`, and the reasoner will just do a plain string equality comparison for unification.
 
 ```python
-# constants and predicates can be defined with an embedding array for strict (non-fuzzy) unification
+# constants and predicates can be defined without an embedding array for strict (non-fuzzy) unification
 grandpa_of = Predicate("grandpa_of")
 bart = Constant("bart")
 ```
@@ -91,7 +88,8 @@ By default, the reasoner will use cosine similarity for unification. If you'd li
 ```python
 
 def fancy_similarity(item1, item2):
-    return np.linalg.norm(item1.vector - item2.vector) / (np.linalg.norm(x) + np.linalg.norm(y))
+    norm = np.linalg.norm(item1.vector) + np.linalg.norm(item2.vector)
+    return np.linalg.norm(item1.vector - item2.vector) / norm
 
 reasoner = SLDReasoner(rules=rules, similarity_func=fancy_similarity)
 ```
