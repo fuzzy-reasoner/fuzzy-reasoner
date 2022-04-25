@@ -4,7 +4,6 @@
 [![Codecov](https://img.shields.io/codecov/c/github/chanind/fuzzy-reasoner/main)](https://codecov.io/gh/chanind/fuzzy-reasoner)
 [![PyPI](https://img.shields.io/pypi/v/fuzzy-reasoner?color=blue)](https://pypi.org/project/fuzzy-reasoner/)
 
-
 A simple symbolic reasoner which allows fuzzy unification based on embedding comparisons.
 
 This projects takes ideas and inspiration from the following papers:
@@ -24,9 +23,7 @@ pip install fuzzy-reasoner
 
 This library is still very much in beta and may change its public API at any time before reaching version 1.0, so it's recommended to pin the exact version before then.
 
-This library is currently limited to only use a rule once in a proof as a way to avoid cycles in the proof graph. This restriction should be fixed soon though, as this restriction does limit the usefulness of the library.
-
-This library is pure Python, and is not highly optimized code. If you need a high-performance mature solver this package is likely not a great fit. However, pull requests are welcome if you'd like to contribute and help make this library higher-performance!
+This library is pure Python, and is not highly optimized code. If you need a high-performance solver this package is likely not a great fit. However, pull requests are welcome if there are any improvements you'd like to make!
 
 ## Usage
 

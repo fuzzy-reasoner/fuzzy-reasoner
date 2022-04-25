@@ -17,6 +17,7 @@ from fuzzy_reasoner.types.Variable import Variable
 def unify(
     rule: Rule,
     goal: Goal,
+    scope: int,
     substitutions: SubstitutionsMap,
     similarity_func: Optional[SimilarityFunc] = None,
     min_similarity_threshold: float = 0.5,
@@ -45,19 +46,19 @@ def unify(
         return None
 
     for head_term, goal_term in zip(head.terms, goal.statement.terms):
-        head_term_resolution = resolve_term(head_term, rule, next_substitutions)
+        head_term_resolution = resolve_term(head_term, scope, next_substitutions)
         goal_term_resolution = resolve_term(goal_term, goal.scope, next_substitutions)
         if isinstance(head_term_resolution, Variable):
             # fail unification if it requires rebinding an already bound variable
-            if is_var_bound(head_term_resolution, rule, next_substitutions):
+            if is_var_bound(head_term_resolution, scope, next_substitutions):
                 return None
-            target_value: Constant | tuple[Rule, Variable] = (
+            target_value: Constant | tuple[int, Variable] = (
                 goal_term_resolution
                 if isinstance(goal_term_resolution, Constant)
                 else (goal.scope, goal_term_resolution)
             )
             next_substitutions = set_var_binding(
-                head_term_resolution, rule, target_value, next_substitutions
+                head_term_resolution, scope, target_value, next_substitutions
             )
         elif isinstance(goal_term_resolution, Variable):
             # fail unification if it requires rebinding an already bound variable

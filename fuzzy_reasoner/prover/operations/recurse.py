@@ -3,17 +3,20 @@ from typing import Optional
 
 from fuzzy_reasoner.prover.Goal import Goal
 from fuzzy_reasoner.prover.ProofState import ProofState
+from fuzzy_reasoner.prover.operations.substitution import generate_variable_scope
 from fuzzy_reasoner.prover.operations.unify import unify
 from fuzzy_reasoner.prover.ProofGraph import (
     ProofGraphNode,
 )
 from fuzzy_reasoner.similarity import SimilarityFunc
+from fuzzy_reasoner.types.Rule import Rule
 
 
 def recurse(
     goal: Goal,
     max_depth: int,
     proof_state: ProofState,
+    rules: frozenset[Rule],
     similarity_func: Optional[SimilarityFunc],
     min_similarity_threshold: float,
 ) -> tuple[list[ProofState], list[ProofGraphNode]]:
@@ -24,10 +27,12 @@ def recurse(
     """
     next_proof_states: list[ProofState] = []
     graph_nodes: list[ProofGraphNode] = []
-    for rule in proof_state.available_rules:
+    for rule in rules:
+        scope = generate_variable_scope()
         unify_result = unify(
             rule,
             goal,
+            scope,
             proof_state.substitutions,
             similarity_func=similarity_func,
             min_similarity_threshold=min_similarity_threshold,
@@ -40,15 +45,15 @@ def recurse(
         next_proof_state = ProofState(
             similarity=overall_similarity,
             substitutions=substitutions,
-            available_rules=proof_state.available_rules.difference([rule]),
         )
         # if there's more atoms in the body of the rule, we'll need to AND them to continue the proof
         if rule.body:
-            subgoals = tuple(Goal(atom, scope=rule) for atom in rule.body)
+            subgoals = tuple(Goal(atom, scope=scope) for atom in rule.body)
             child_proof_states, child_graph_nodes_lists = join(
                 subgoals,
                 max_depth,
                 next_proof_state,
+                rules,
                 similarity_func,
                 min_similarity_threshold,
             )
@@ -61,6 +66,7 @@ def recurse(
                 graph_nodes.append(
                     ProofGraphNode(
                         goal.statement,
+                        scope,
                         rule,
                         unification_similarity=similarity,
                         overall_similarity=child_proof_state.similarity,
@@ -73,6 +79,7 @@ def recurse(
             graph_nodes.append(
                 ProofGraphNode(
                     goal.statement,
+                    scope,
                     rule,
                     unification_similarity=similarity,
                     overall_similarity=overall_similarity,
@@ -86,6 +93,7 @@ def join(
     goals: tuple[Goal, ...],
     max_depth: int,
     proof_state: ProofState,
+    rules: frozenset[Rule],
     similarity_func: Optional[SimilarityFunc],
     min_similarity_threshold: float,
 ) -> tuple[list[ProofState], list[list[ProofGraphNode]]]:
@@ -106,6 +114,7 @@ def join(
         first_goal,
         max_depth - 1,
         proof_state,
+        rules,
         similarity_func,
         min_similarity_threshold,
     )
@@ -123,6 +132,7 @@ def join(
             remaining_goals,
             max_depth,
             recursed_proof_state,
+            rules,
             similarity_func,
             min_similarity_threshold,
         )

@@ -64,6 +64,79 @@ def test_basic_proof_without_fuzzy_unification() -> None:
     assert prover.prove(grandpa_of(bart, abe)) is None
 
 
+def test_can_use_composite_rules() -> None:
+    X = Variable("X")
+    Y = Variable("Y")
+    Z = Variable("Z")
+    grandpa_of = Predicate("grandpa_of")
+    parent_of = Predicate("parent_of")
+    father_of = Predicate("father_of")
+    is_male = Predicate("is_male")
+    is_female = Predicate("is_female")
+    bart = Constant("bart")
+    marge = Constant("marge")
+    homer = Constant("homer")
+    abe = Constant("abe")
+
+    grandpa_of_def = Rule(grandpa_of(X, Y), (father_of(X, Z), parent_of(Z, Y)))
+    father_of_def = Rule(father_of(X, Y), (parent_of(X, Y), is_male(X)))
+
+    rules = [
+        # base facts
+        Rule(parent_of(homer, bart)),
+        Rule(parent_of(abe, homer)),
+        Rule(is_male(abe)),
+        Rule(is_male(homer)),
+        Rule(is_male(bart)),
+        Rule(is_female(marge)),
+        # theorems
+        grandpa_of_def,
+        father_of_def,
+    ]
+
+    prover = SLDProver(rules=rules)
+    goal = grandpa_of(abe, bart)
+
+    result = prover.prove(goal)
+    assert result is not None
+
+
+def test_can_use_recursive_theorems() -> None:
+    X = Variable("X")
+    Y = Variable("Y")
+    Z = Variable("Z")
+    ancestor_of = Predicate("ancestor_of")
+    parent_of = Predicate("parent_of")
+    a = Constant("a")
+    b = Constant("b")
+    c = Constant("c")
+    d = Constant("d")
+    e = Constant("e")
+
+    rules = [
+        # base facts
+        Rule(parent_of(a, b)),
+        Rule(parent_of(b, c)),
+        Rule(parent_of(c, d)),
+        Rule(parent_of(d, e)),
+        # theorems
+        Rule(ancestor_of(X, Y), (parent_of(X, Z), ancestor_of(Z, Y))),
+        Rule(ancestor_of(X, Y), (parent_of(X, Y),)),
+    ]
+
+    prover = SLDProver(rules=rules)
+
+    assert prover.prove(ancestor_of(a, b)) is not None
+    assert prover.prove(ancestor_of(a, c)) is not None
+    assert prover.prove(ancestor_of(a, d)) is not None
+    assert prover.prove(ancestor_of(a, e)) is not None
+    assert prover.prove(ancestor_of(c, e)) is not None
+
+    assert prover.prove(ancestor_of(e, c)) is None
+    assert prover.prove(ancestor_of(b, a)) is None
+    assert prover.prove(ancestor_of(e, a)) is None
+
+
 def test_can_solve_for_variable_values() -> None:
     X = Variable("X")
     Y = Variable("Y")

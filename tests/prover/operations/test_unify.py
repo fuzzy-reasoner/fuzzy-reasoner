@@ -13,6 +13,9 @@ from fuzzy_reasoner.types.Rule import Rule
 from fuzzy_reasoner.types.Variable import Variable
 
 
+scope = 7  # scope is just a number to identify variable bindings
+
+
 def test_unify_returns_new_substitution_map_and_similarity_on_success() -> None:
     is_dog = Predicate("is_dog")
     X = Variable("X")
@@ -21,17 +24,18 @@ def test_unify_returns_new_substitution_map_and_similarity_on_success() -> None:
     rule1 = Rule(is_dog(X))
     rule2 = Rule(is_dog(fluffy))
 
-    goal = Goal(rule1.head, rule1)
+    goal = Goal(rule1.head, scope)
 
     result = unify(
         rule2,
         goal,
+        scope,
         Map(),
         similarity_func=cosine_similarity,
         min_similarity_threshold=0.5,
     )
     assert result is not None
-    assert result[0] == Map({rule1: Map({X: fluffy})})
+    assert result[0] == Map({scope: Map({X: fluffy})})
     assert result[1] == 1.0
 
 
@@ -44,12 +48,13 @@ def test_unify_fails_if_similarity_is_below_threshold() -> None:
     rule1 = Rule(is_person(X))
     rule2 = Rule(is_dog(fluffy))
 
-    goal = Goal(rule1.head, rule1)
+    goal = Goal(rule1.head, scope)
 
     assert (
         unify(
             rule2,
             goal,
+            scope,
             Map(),
             similarity_func=cosine_similarity,
             min_similarity_threshold=0.9,
@@ -68,12 +73,13 @@ def test_unify_fails_if_the_terms_are_different_lengths() -> None:
     rule1 = Rule(is_doggo(X))
     rule2 = Rule(is_dog(fluffy, face))
 
-    goal = Goal(rule1.head, rule1)
+    goal = Goal(rule1.head, scope)
 
     assert (
         unify(
             rule2,
             goal,
+            scope,
             Map(),
             similarity_func=cosine_similarity,
             min_similarity_threshold=0.1,
@@ -91,11 +97,12 @@ def test_unify_uses_the_min_similarity_of_all_unified_items() -> None:
     rule1 = Rule(is_doggo(furball))
     rule2 = Rule(is_dog(fluffy))
 
-    goal = Goal(rule1.head, rule1)
+    goal = Goal(rule1.head, scope)
 
     result = unify(
         rule2,
         goal,
+        scope,
         Map(),
         similarity_func=cosine_similarity,
         min_similarity_threshold=0.1,
