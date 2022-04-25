@@ -3,6 +3,7 @@ from typing import Optional, Sequence
 from fuzzy_reasoner.prover.Goal import Goal
 from fuzzy_reasoner.prover.ProofState import ProofState
 from fuzzy_reasoner.prover.operations.recurse import recurse
+from fuzzy_reasoner.prover.operations.substitution import generate_variable_scope
 from fuzzy_reasoner.similarity import SimilarityFunc, cosine_similarity
 
 from fuzzy_reasoner.types.Atom import Atom
@@ -38,12 +39,17 @@ class SLDProver:
     def prove_all(
         self, goal: Goal | Atom, dynamic_rules: Optional[Sequence[Rule]] = None
     ) -> list[ProofGraph]:
-        adjusted_goal = goal if isinstance(goal, Goal) else Goal(goal, scope=Rule(goal))
+        adjusted_goal = (
+            goal
+            if isinstance(goal, Goal)
+            else Goal(goal, scope=generate_variable_scope())
+        )
         rules = self.rules.union(dynamic_rules) if dynamic_rules else self.rules
         _successful_proof_states, successful_graph_nodes = recurse(
             adjusted_goal,
             self.max_proof_depth,
-            ProofState(available_rules=rules),
+            ProofState(),
+            rules,
             self.similarity_func,
             self.min_similarity_threshold,
         )

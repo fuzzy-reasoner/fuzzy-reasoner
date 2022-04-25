@@ -3,21 +3,30 @@ from typing import Tuple, Union
 from immutables import Map
 
 from fuzzy_reasoner.types.Constant import Constant
-from fuzzy_reasoner.types.Rule import Rule
 from fuzzy_reasoner.types.Variable import Variable
 
 
 # using from __future__ import annotations with | doesn't work here
 # I think because this is declaring a type as a variable
-SubstitutionsMap = Map[Rule, Map[Variable, Union[Constant, Tuple[Rule, Variable]]]]
+SubstitutionsMap = Map[int, Map[Variable, Union[Constant, Tuple[int, Variable]]]]
 
 
 class VariableBindingError(Exception):
     pass
 
 
+_count = 0
+
+
+def generate_variable_scope() -> int:
+    """simple helper to output different int each time its called to use as a scope for variable binding"""
+    global _count
+    _count += 1
+    return _count
+
+
 def resolve_term(
-    term: Variable | Constant, scope: Rule, substitutions: SubstitutionsMap
+    term: Variable | Constant, scope: int, substitutions: SubstitutionsMap
 ) -> Variable | Constant:
     """
     if this term is a variable that's already been bound to a constant in the substitutions map, swap it for its bound value
@@ -30,13 +39,13 @@ def resolve_term(
 
 
 def is_var_bound(
-    variable: Variable, scope: Rule, substitutions: SubstitutionsMap
+    variable: Variable, scope: int, substitutions: SubstitutionsMap
 ) -> bool:
     return bool(get_var_binding(variable, scope, substitutions))
 
 
 def get_var_binding(
-    variable: Variable, scope: Rule, substitutions: SubstitutionsMap
+    variable: Variable, scope: int, substitutions: SubstitutionsMap
 ) -> Constant | None:
     """Return the currently bound constant for this variable if already bound, or None if not bound yet"""
     scope_bindings = substitutions.get(scope)
@@ -51,9 +60,9 @@ def get_var_binding(
 
 def set_var_binding(
     variable: Variable,
-    scope: Rule,
+    scope: int,
     # tuple[rule, var] represents the path to look up that variable recursively in the substitutions mapping
-    value: Constant | tuple[Rule, Variable],
+    value: Constant | tuple[int, Variable],
     substitutions: SubstitutionsMap,
 ) -> SubstitutionsMap:
     scope_bindings = substitutions.get(scope)

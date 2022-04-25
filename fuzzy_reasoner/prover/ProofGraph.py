@@ -13,6 +13,7 @@ from fuzzy_reasoner.types.Variable import Variable
 @dataclass(frozen=True, eq=False)
 class ProofGraphNode:
     goal: Atom
+    scope: int
     rule: Rule
     unification_similarity: float
     overall_similarity: float
@@ -38,6 +39,6 @@ class ProofGraph:
         for term in self.goal.terms:
             if isinstance(term, Variable):
                 bindings[term] = resolve_term(
-                    term, self.head.rule, self.head.substitutions
+                    term, self.head.scope, self.head.substitutions
                 )
         return Map(bindings)
