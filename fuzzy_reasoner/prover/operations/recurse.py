@@ -5,8 +5,7 @@ from fuzzy_reasoner.prover.Goal import Goal
 from fuzzy_reasoner.prover.ProofState import ProofState
 from fuzzy_reasoner.prover.operations.unify import unify
 from fuzzy_reasoner.prover.ProofGraph import (
-    ProofGraphUnificationNode,
-    ProofGraphConjunctionNode,
+    ProofGraphNode,
 )
 from fuzzy_reasoner.similarity import SimilarityFunc
 
@@ -17,14 +16,14 @@ def recurse(
     proof_state: ProofState,
     similarity_func: Optional[SimilarityFunc],
     min_similarity_threshold: float,
-) -> tuple[list[ProofState], list[ProofGraphUnificationNode]]:
+) -> tuple[list[ProofState], list[ProofGraphNode]]:
     """
     Operation corresponding to OR from "end-to-end differentiable proving"
     This will try to unify every available rule against the current goal
     and will return the resulting ProofStates
     """
     next_proof_states: list[ProofState] = []
-    graph_nodes: list[ProofGraphUnificationNode] = []
+    graph_nodes: list[ProofGraphNode] = []
     for rule in proof_state.available_rules:
         unify_result = unify(
             rule,
@@ -47,7 +46,7 @@ def recurse(
         # if there's more atoms in the body of the rule, we'll need to AND them to continue the proof
         if rule.body:
             subgoals = tuple(Goal(atom, scope=rule) for atom in rule.body)
-            child_proof_states, child_graph_nodes = join(
+            child_proof_states, child_graph_nodes_lists = join(
                 subgoals,
                 max_depth,
                 next_proof_state,
@@ -57,23 +56,23 @@ def recurse(
             if not child_proof_states:
                 continue
             next_proof_states += child_proof_states
-            for child_node, child_proof_state in zip(
-                child_graph_nodes, child_proof_states
+            for child_node_list, child_proof_state in zip(
+                child_graph_nodes_lists, child_proof_states
             ):
                 graph_nodes.append(
-                    ProofGraphUnificationNode(
+                    ProofGraphNode(
                         goal.statement,
                         rule,
                         unification_similarity=similarity,
                         overall_similarity=child_proof_state.similarity,
                         substitutions=child_proof_state.substitutions,
-                        child=child_node,
+                        children=child_node_list,
                     )
                 )
         else:
             next_proof_states.append(next_proof_state)
             graph_nodes.append(
-                ProofGraphUnificationNode(
+                ProofGraphNode(
                     goal.statement,
                     rule,
                     unification_similarity=similarity,
@@ -90,7 +89,7 @@ def join(
     proof_state: ProofState,
     similarity_func: Optional[SimilarityFunc],
     min_similarity_threshold: float,
-) -> tuple[list[ProofState], list[ProofGraphConjunctionNode]]:
+) -> tuple[list[ProofState], list[list[ProofGraphNode]]]:
     """
     Operation corresponding to AND from "end-to-end differentiable proving"
 
@@ -101,7 +100,7 @@ def join(
         return [], []
 
     proof_states: list[ProofState] = []
-    conjunction_nodes: list[ProofGraphConjunctionNode] = []
+    conjunction_nodes: list[list[ProofGraphNode]] = []
     first_goal = goals[0]
     remaining_goals = goals[1:]
     recursed_proof_states, recursed_graph_nodes = recurse(
@@ -116,17 +115,12 @@ def join(
         return [], []
     # no more goals to prove, so every successful proof of the main goal is sufficient
     if len(remaining_goals) == 0:
-        conjunction_nodes = [
-            ProofGraphConjunctionNode(
-                tuple(goal.statement for goal in goals), children=(node,)
-            )
-            for node in recursed_graph_nodes
-        ]
+        conjunction_nodes = [recursed_graph_nodes]
         return recursed_proof_states, conjunction_nodes
     for recursed_proof_state, recursed_graph_node in zip(
         recursed_proof_states, recursed_graph_nodes
     ):
-        joined_proof_states, joined_graph_nodes = join(
+        joined_proof_states, joined_graph_nodes_lists = join(
             remaining_goals,
             max_depth,
             recursed_proof_state,
@@ -136,12 +130,7 @@ def join(
         if not joined_proof_states:
             continue
         proof_states += joined_proof_states
-        conjunction_nodes += [
-            ProofGraphConjunctionNode(
-                tuple(goal.statement for goal in goals),
-                children=(recursed_graph_node, *node.children),
-            )
-            for node in joined_graph_nodes
-        ]
+        for joined_graph_nodes in joined_graph_nodes_lists:
+            conjunction_nodes.append([recursed_graph_node, *joined_graph_nodes])
 
     return proof_states, conjunction_nodes

@@ -11,24 +11,18 @@ from fuzzy_reasoner.types.Variable import Variable
 
 
 @dataclass(frozen=True, eq=False)
-class ProofGraphUnificationNode:
+class ProofGraphNode:
     goal: Atom
     rule: Rule
     unification_similarity: float
     overall_similarity: float
-    child: Optional[ProofGraphConjunctionNode] = None
+    children: Optional[list[ProofGraphNode]] = None
     substitutions: SubstitutionsMap = Map()
 
 
 @dataclass(frozen=True, eq=False)
-class ProofGraphConjunctionNode:
-    goals: tuple[Atom, ...]
-    children: tuple[ProofGraphUnificationNode, ...]
-
-
-@dataclass(frozen=True, eq=False)
 class ProofGraph:
-    head: ProofGraphUnificationNode
+    head: ProofGraphNode
 
     @property
     def goal(self) -> Atom:
