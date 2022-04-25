@@ -1,6 +1,9 @@
 # Fuzzy Reasoner
 
-![example workflow](https://github.com/chanind/fuzzy-reasoner/actions/workflows/ci.yaml/badge.svg?branch=main)
+[![ci](https://img.shields.io/github/workflow/status/chanind/fuzzy-reasoner/CI/main)](https://github.com/chanind/fuzzy-reasoner)
+[![Codecov](https://img.shields.io/codecov/c/github/chanind/fuzzy-reasoner/main)](https://codecov.io/gh/chanind/fuzzy-reasoner)
+[![PyPI](https://img.shields.io/pypi/v/fuzzy-reasoner?color=blue)](https://pypi.org/project/fuzzy-reasoner/)
+
 
 A simple symbolic reasoner which allows fuzzy unification based on embedding comparisons.
 
