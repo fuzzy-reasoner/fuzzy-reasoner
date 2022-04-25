@@ -1,6 +1,6 @@
 # Fuzzy Reasoner
-![example workflow](https://github.com/chanind/fuzzy-reasoner/actions/workflows/ci.yaml/badge.svg?branch=main)
 
+![example workflow](https://github.com/chanind/fuzzy-reasoner/actions/workflows/ci.yaml/badge.svg?branch=main)
 
 A simple symbolic reasoner which allows fuzzy unification based on embedding comparisons.
 
@@ -16,6 +16,14 @@ Thank you so much to the authors of these papers!
 ```
 pip install fuzzy-reasoner
 ```
+
+## Limitations and issues
+
+This library is still very much in beta and may change its public API at any time before reaching version 1.0, so it's recommended to pin the exact version before then.
+
+This library is currently limited to only use a rule once in a proof as a way to avoid cycles in the proof graph. This restriction should be fixed soon though, as this restriction does limit the usefulness of the library.
+
+This library is pure Python, and is not highly optimized code. If you need a high-performance mature solver this package is likely not a great fit. However, pull requests are welcome if you'd like to contribute and help make this library higher-performance!
 
 ## Usage
 
@@ -98,14 +106,6 @@ By default, the SLDReasoner will abort proofs after a depth of 10. You can custo
 ```python
 reasoner = SLDReasoner(rules=rules, max_proof_depth=10)
 ```
-
-## Limitations and issues
-
-This library is still very much in beta and may change its public API at any time before reaching version 1.0, so it's recommended to pin the exact version before then.
-
-This library is currently limited to only use a rule once in a proof as a way to avoid cycles in the proof graph. This restriction should be fixed soon though, as this restriction does limit the usefulness of the library.
-
-This library is pure Python, and is not highly optimized code. If you need a high-performance mature solver this package is likely not a great fit. However, pull requests are welcome if you'd like to contribute and help make this library higher-performance!
 
 ## Contributing
 

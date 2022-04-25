@@ -112,3 +112,39 @@ def test_can_solve_for_variable_values() -> None:
     # should not be able to find proofs of things that are false
     assert prover.prove(grandpa_of(X, homer)) is None
     assert prover.prove(grandpa_of(bart, X)) is None
+
+
+def test_prove_all_can_find_multiple_solutions_with() -> None:
+    X = Variable("X")
+    Y = Variable("Y")
+    Z = Variable("Z")
+    grandpa_of = Predicate("grandpa_of")
+    parent_of = Predicate("parent_of")
+    father_of = Predicate("father_of")
+    bart = Constant("bart")
+    homer = Constant("homer")
+    marge = Constant("marge")
+    clancy = Constant("clancy")
+    abe = Constant("abe")
+
+    grandpa_of_def = Rule(grandpa_of(X, Y), (father_of(X, Z), parent_of(Z, Y)))
+
+    rules = [
+        # base facts
+        Rule(parent_of(homer, bart)),
+        Rule(parent_of(marge, bart)),
+        Rule(father_of(abe, homer)),
+        Rule(father_of(clancy, marge)),
+        # theorems
+        grandpa_of_def,
+    ]
+
+    prover = SLDProver(rules=rules)
+
+    goal = grandpa_of(X, bart)
+
+    results = prover.prove_all(goal)
+    assert len(results) == 2
+    var_bindings_for_x = {result.variable_bindings[X] for result in results}
+    assert abe in var_bindings_for_x
+    assert clancy in var_bindings_for_x
