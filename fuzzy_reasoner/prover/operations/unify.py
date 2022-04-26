@@ -24,7 +24,7 @@ def unify(
 ) -> tuple[SubstitutionsMap, float] | None:
     """
     Fuzzy-optional implementation of prolog's unify
-    If no similarity_func is provided, of if either atom lacks a vector,
+    If no similarity_func is provided, of if either atom lacks a embedding,
     then it will do an exact match on the symbols themselves
 
     Based on unification module from "End-to-End Differentiable Proving" by Rocktäschel et al.

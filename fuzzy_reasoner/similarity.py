@@ -24,10 +24,10 @@ def cosine_similarity(
 ) -> float:
     """
     use cosine similarity to calculate a similarity score between the items.
-    falls back to symbol comparison if either item is missing a vector
+    falls back to symbol comparison if either item is missing a embedding
     """
-    if item1.vector is None or item2.vector is None:
+    if item1.embedding is None or item2.embedding is None:
         return symbol_compare(item1, item2)
-    return np.dot(item1.vector, item2.vector) / (
-        norm(item1.vector) * norm(item2.vector)
+    return np.dot(item1.embedding, item2.embedding) / (
+        norm(item1.embedding) * norm(item2.embedding)
     )
