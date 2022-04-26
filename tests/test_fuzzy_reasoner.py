@@ -1,3 +1,4 @@
+from textwrap import dedent
 from fuzzy_reasoner import (
     SLDProver,
     Atom,
@@ -19,3 +20,52 @@ def test_imports() -> None:
     assert Variable is not None
     assert cosine_similarity is not None
     assert symbol_compare is not None
+
+
+def test_basic_proof() -> None:
+    X = Variable("X")
+    Y = Variable("Y")
+    father_of = Predicate("father_of")
+    parent_of = Predicate("parent_of")
+    is_male = Predicate("is_male")
+    bart = Constant("bart")
+    homer = Constant("homer")
+
+    rules = [
+        Rule(parent_of(homer, bart)),
+        Rule(is_male(homer)),
+        Rule(father_of(X, Y), (parent_of(X, Y), is_male(X))),
+    ]
+
+    prover = SLDProver(rules=rules)
+    goal = father_of(homer, X)
+
+    proof = prover.prove(goal)
+    assert proof is not None
+    assert proof.variable_bindings[X] == bart
+
+    pretty_proof = dedent(
+        """
+        | goal: father_of(CONST:homer,VAR:X)
+        | rule: father_of(VAR:X,VAR:Y):-[parent_of(VAR:X,VAR:Y), is_male(VAR:X)]
+        | unification similarity: 1.0
+        | overall similarity: 1.0
+        | goal subs: X->bart
+        | rule subs: X->homer, Y->bart
+        | subgoals: parent_of(VAR:X,VAR:Y), is_male(VAR:X)
+          ║
+          ╠═ | goal: parent_of(VAR:X,VAR:Y)
+          ║  | rule: parent_of(CONST:homer,CONST:bart):-[]
+          ║  | unification similarity: 1.0
+          ║  | overall similarity: 1.0
+          ║  | goal subs: X->homer, Y->bart
+          ║
+          ╠═ | goal: is_male(VAR:X)
+          ║  | rule: is_male(CONST:homer):-[]
+          ║  | unification similarity: 1.0
+          ║  | overall similarity: 1.0
+          ║  | goal subs: X->homer
+        """
+    ).strip()
+    print(proof.pretty_print())
+    assert proof.pretty_print() == pretty_proof

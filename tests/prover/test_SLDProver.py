@@ -37,27 +37,27 @@ def test_basic_proof_without_fuzzy_unification() -> None:
     prover = SLDProver(rules=rules)
     goal = grandpa_of(abe, bart)
 
-    result = prover.prove(goal)
-    assert result is not None
-    assert result.similarity_score == 1.0
-    assert result.goal == goal
+    proof = prover.prove(goal)
+    assert proof is not None
+    assert proof.similarity_score == 1.0
+    assert proof.goal == goal
 
     # should first unify against grandpa_of(X,Y) :- father_of(X,Z), parent_of(Z,Y)
-    assert result.head.rule == grandpa_of_def
+    assert proof.head.rule == grandpa_of_def
 
     # should then join the 2 subgoals
-    assert result.head.children is not None
-    assert len(result.head.children) == 2
+    assert proof.head.children is not None
+    assert len(proof.head.children) == 2
 
     assert grandpa_of_def.body is not None  # for mypy
 
     # should then unify father_of(X,Z) with father_of(abe, homer)
-    assert result.head.children[0].goal == grandpa_of_def.body[0]
-    assert result.head.children[0].children is None
+    assert proof.head.children[0].goal == grandpa_of_def.body[0]
+    assert proof.head.children[0].children is None
 
     # should then unify parent_of(Z,Y) with parent_of(homer, bart)
-    assert result.head.children[1].goal == grandpa_of_def.body[1]
-    assert result.head.children[1].children is None
+    assert proof.head.children[1].goal == grandpa_of_def.body[1]
+    assert proof.head.children[1].children is None
 
     # should not be able to prove things that are false
     assert prover.prove(grandpa_of(mona, bart)) is None
