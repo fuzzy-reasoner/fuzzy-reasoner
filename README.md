@@ -119,27 +119,25 @@ goal = father_of(homer, X)
 proof = prover.prove(goal)
 
 print(proof.pretty_print())
-###
-| goal: father_of(CONST:homer,VAR:X)
-| rule: father_of(VAR:X,VAR:Y):-[parent_of(VAR:X,VAR:Y), is_male(VAR:X)]
-| unification similarity: 1.0
-| overall similarity: 1.0
-| goal subs: X->bart
-| rule subs: X->homer, Y->bart
-| subgoals: parent_of(VAR:X,VAR:Y), is_male(VAR:X)
-  ║
-  ╠═ | goal: parent_of(VAR:X,VAR:Y)
-  ║  | rule: parent_of(CONST:homer,CONST:bart):-[]
-  ║  | unification similarity: 1.0
-  ║  | overall similarity: 1.0
-  ║  | goal subs: X->homer, Y->bart
-  ║
-  ╠═ | goal: is_male(VAR:X)
-  ║  | rule: is_male(CONST:homer):-[]
-  ║  | unification similarity: 1.0
-  ║  | overall similarity: 1.0
-  ║  | goal subs: X->homer
-###
+# | goal: father_of(CONST:homer,VAR:X)
+# | rule: father_of(VAR:X,VAR:Y):-[parent_of(VAR:X,VAR:Y), is_male(VAR:X)]
+# | unification similarity: 1.0
+# | overall similarity: 1.0
+# | goal subs: X->bart
+# | rule subs: X->homer, Y->bart
+# | subgoals: parent_of(VAR:X,VAR:Y), is_male(VAR:X)
+#   ║
+#   ╠═ | goal: parent_of(VAR:X,VAR:Y)
+#   ║  | rule: parent_of(CONST:homer,CONST:bart):-[]
+#   ║  | unification similarity: 1.0
+#   ║  | overall similarity: 1.0
+#   ║  | goal subs: X->homer, Y->bart
+#   ║
+#   ╠═ | goal: is_male(VAR:X)
+#   ║  | rule: is_male(CONST:homer):-[]
+#   ║  | unification similarity: 1.0
+#   ║  | overall similarity: 1.0
+#   ║  | goal subs: X->homer
 ```
 
 ### Finding all possible proofs
