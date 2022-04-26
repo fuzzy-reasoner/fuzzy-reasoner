@@ -151,8 +151,8 @@ By default, the reasoner will use cosine similarity for unification. If you'd li
 ```python
 
 def fancy_similarity(item1, item2):
-    norm = np.linalg.norm(item1.vector) + np.linalg.norm(item2.vector)
-    return np.linalg.norm(item1.vector - item2.vector) / norm
+    norm = np.linalg.norm(item1.embedding) + np.linalg.norm(item2.embedding)
+    return np.linalg.norm(item1.embedding - item2.embedding) / norm
 
 reasoner = SLDReasoner(knowledge=knowledge, similarity_func=fancy_similarity)
 ```
@@ -161,6 +161,30 @@ By default, there is a minimum similarity threshold of `0.5` for a unification t
 
 ```python
 reasoner = SLDReasoner(knowledge=knowledge, min_similarity_threshold=0.9)
+```
+
+### Working with Tensors (Pytorch, Tensorflow, etc...)
+
+By default, the similarity calculation assumes that the embeddings supplied for constants and predicates are numpy arrays. If you want to use tensors instead, this will work as long as you provide a `similarity_func` which can work with the tensor types you're using and return a float.
+
+For example, if you're using Pytorch, it might look like the following:
+
+```python
+import torch
+
+def torch_cosine_similarity(item1, item2):
+    similarity = torch.nn.functional.cosine_similarity(
+        item1.embedding,
+        item2.embedding,
+        0
+    )
+    return similarity.item()
+
+reasoner = SLDReasoner(knowledge=knowledge, similarity_func=torch_cosine_similarity)
+
+# for pytorch you may want to wrap the proving in torch.no_grad()
+with torch.no_grad():
+    proof = reasoner.prove(goal)
 ```
 
 ### Max proof depth

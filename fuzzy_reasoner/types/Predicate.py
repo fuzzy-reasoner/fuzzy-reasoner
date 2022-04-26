@@ -1,7 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Optional, Any
-from numpy.typing import NDArray
 
 from .Constant import Constant
 from .Variable import Variable
@@ -15,7 +14,7 @@ if TYPE_CHECKING:
 @dataclass(frozen=True, eq=False)
 class Predicate:
     symbol: str
-    vector: Optional[NDArray[Any]] = None
+    embedding: Optional[Any] = None
 
     # shorthand for creating an Atom out of this predicate and terms
     def __call__(self, *terms: Constant | Variable) -> Atom:

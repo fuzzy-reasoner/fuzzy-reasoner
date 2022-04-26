@@ -12,7 +12,7 @@ def test_cosine_similarity_uses_the_provided_similarity_metric() -> None:
     ) == pytest.approx(0.5)
 
 
-def test_cosine_similarity_compares_symbols_if_either_const_is_missing_a_vector() -> None:
+def test_cosine_similarity_compares_symbols_if_either_const_is_missing_a_embedding() -> None:
     assert cosine_similarity(
         Constant("a", np.array([1, 0, 1])),
         Constant("b"),
