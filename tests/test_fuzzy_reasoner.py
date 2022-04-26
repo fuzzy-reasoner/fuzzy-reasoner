@@ -6,6 +6,7 @@ from fuzzy_reasoner import (
     Predicate,
     Rule,
     Variable,
+    Knowledge,
     cosine_similarity,
     symbol_compare,
 )
@@ -31,13 +32,13 @@ def test_basic_proof() -> None:
     bart = Constant("bart")
     homer = Constant("homer")
 
-    rules = [
-        Rule(parent_of(homer, bart)),
-        Rule(is_male(homer)),
+    knowledge: Knowledge = [
+        parent_of(homer, bart),
+        is_male(homer),
         Rule(father_of(X, Y), (parent_of(X, Y), is_male(X))),
     ]
 
-    prover = SLDProver(rules=rules)
+    prover = SLDProver(knowledge=knowledge)
     goal = father_of(homer, X)
 
     proof = prover.prove(goal)

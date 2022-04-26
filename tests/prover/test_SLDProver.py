@@ -23,7 +23,7 @@ def test_basic_proof_without_fuzzy_unification() -> None:
     grandpa_of_def = Rule(grandpa_of(X, Y), (father_of(X, Z), parent_of(Z, Y)))
     grandma_of_def = Rule(grandma_of(X, Y), (mother_of(X, Z), parent_of(Z, Y)))
 
-    rules = [
+    knowledge = [
         # base facts
         Rule(parent_of(homer, bart)),
         Rule(parent_of(marge, bart)),
@@ -34,7 +34,7 @@ def test_basic_proof_without_fuzzy_unification() -> None:
         grandma_of_def,
     ]
 
-    prover = SLDProver(rules=rules)
+    prover = SLDProver(knowledge=knowledge)
     goal = grandpa_of(abe, bart)
 
     proof = prover.prove(goal)
@@ -64,7 +64,7 @@ def test_basic_proof_without_fuzzy_unification() -> None:
     assert prover.prove(grandpa_of(bart, abe)) is None
 
 
-def test_can_use_composite_rules() -> None:
+def test_can_use_composite_knowledge() -> None:
     X = Variable("X")
     Y = Variable("Y")
     Z = Variable("Z")
@@ -81,7 +81,7 @@ def test_can_use_composite_rules() -> None:
     grandpa_of_def = Rule(grandpa_of(X, Y), (father_of(X, Z), parent_of(Z, Y)))
     father_of_def = Rule(father_of(X, Y), (parent_of(X, Y), is_male(X)))
 
-    rules = [
+    knowledge = [
         # base facts
         Rule(parent_of(homer, bart)),
         Rule(parent_of(abe, homer)),
@@ -94,7 +94,7 @@ def test_can_use_composite_rules() -> None:
         father_of_def,
     ]
 
-    prover = SLDProver(rules=rules)
+    prover = SLDProver(knowledge=knowledge)
     goal = grandpa_of(abe, bart)
 
     result = prover.prove(goal)
@@ -113,7 +113,7 @@ def test_can_use_recursive_theorems() -> None:
     d = Constant("d")
     e = Constant("e")
 
-    rules = [
+    knowledge = [
         # base facts
         Rule(parent_of(a, b)),
         Rule(parent_of(b, c)),
@@ -124,7 +124,7 @@ def test_can_use_recursive_theorems() -> None:
         Rule(ancestor_of(X, Y), (parent_of(X, Y),)),
     ]
 
-    prover = SLDProver(rules=rules)
+    prover = SLDProver(knowledge=knowledge)
 
     assert prover.prove(ancestor_of(a, b)) is not None
     assert prover.prove(ancestor_of(a, c)) is not None
@@ -155,7 +155,7 @@ def test_can_solve_for_variable_values() -> None:
     grandpa_of_def = Rule(grandpa_of(X, Y), (father_of(X, Z), parent_of(Z, Y)))
     grandma_of_def = Rule(grandma_of(X, Y), (mother_of(X, Z), parent_of(Z, Y)))
 
-    rules = [
+    knowledge = [
         # base facts
         Rule(parent_of(homer, bart)),
         Rule(parent_of(marge, bart)),
@@ -166,7 +166,7 @@ def test_can_solve_for_variable_values() -> None:
         grandma_of_def,
     ]
 
-    prover = SLDProver(rules=rules)
+    prover = SLDProver(knowledge=knowledge)
     single_var_goal = grandpa_of(X, bart)
 
     result = prover.prove(single_var_goal)
@@ -203,7 +203,7 @@ def test_prove_all_can_find_multiple_solutions_with() -> None:
 
     grandpa_of_def = Rule(grandpa_of(X, Y), (father_of(X, Z), parent_of(Z, Y)))
 
-    rules = [
+    knowledge = [
         # base facts
         Rule(parent_of(homer, bart)),
         Rule(parent_of(marge, bart)),
@@ -213,7 +213,7 @@ def test_prove_all_can_find_multiple_solutions_with() -> None:
         grandpa_of_def,
     ]
 
-    prover = SLDProver(rules=rules)
+    prover = SLDProver(knowledge=knowledge)
 
     goal = grandpa_of(X, bart)
 
