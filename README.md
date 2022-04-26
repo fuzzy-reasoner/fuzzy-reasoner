@@ -78,6 +78,74 @@ grandpa_of = Predicate("grandpa_of")
 bart = Constant("bart")
 ```
 
+### Working with proof results
+
+The `reasoner.prove()` method will return a `Proof` object if a successful proof is found. This object contains a graph of all the unifications, subgoals, and similarity calculations that went into proving the goal.
+
+```python
+proof = reasoner.prove(goal)
+
+proof.variable_bindings # => a map of all variables in the goal to their bound values
+proof.similarity_score # => the min similarity of all `unify` operations in this proof
+proof_node = proof.head # => the root node of the proof graph
+
+# each proof node represents a unification
+proof_node.goal # => the goal of the unification
+proof_node.rule # => the rule unified against
+proof_node.unification_similarity # => the similarity score of the unification
+proof_node.children # => the child nodes representing subgoals of this unification
+```
+
+The `Proof` object also has a `pretty_print()` method which allows you to get a visual overview of the proof
+
+```python
+X = Variable("X")
+Y = Variable("Y")
+father_of = Predicate("father_of")
+parent_of = Predicate("parent_of")
+is_male = Predicate("is_male")
+bart = Constant("bart")
+homer = Constant("homer")
+
+rules = [
+    Rule(parent_of(homer, bart)),
+    Rule(is_male(homer)),
+    Rule(father_of(X, Y), (parent_of(X, Y), is_male(X))),
+]
+
+prover = SLDProver(rules=rules)
+goal = father_of(homer, X)
+
+proof = prover.prove(goal)
+
+print(proof.pretty_print())
+###
+| goal: father_of(CONST:homer,VAR:X)
+| rule: father_of(VAR:X,VAR:Y):-[parent_of(VAR:X,VAR:Y), is_male(VAR:X)]
+| unification similarity: 1.0
+| overall similarity: 1.0
+| goal subs: X->bart
+| rule subs: X->homer, Y->bart
+| subgoals: parent_of(VAR:X,VAR:Y), is_male(VAR:X)
+  ║
+  ╠═ | goal: parent_of(VAR:X,VAR:Y)
+  ║  | rule: parent_of(CONST:homer,CONST:bart):-[]
+  ║  | unification similarity: 1.0
+  ║  | overall similarity: 1.0
+  ║  | goal subs: X->homer, Y->bart
+  ║
+  ╠═ | goal: is_male(VAR:X)
+  ║  | rule: is_male(CONST:homer):-[]
+  ║  | unification similarity: 1.0
+  ║  | overall similarity: 1.0
+  ║  | goal subs: X->homer
+###
+```
+
+### Finding all possible proofs
+
+The `reasoner.prove()` method will return the proof with the highest similarity score among all possible proofs, if one exists. If you want to get a list of all the possible proofs in descending order of similarity score, you can call `reasoner.prove_all()` to return a list of all proofs.
+
 ### Custom matching functions and similarity thresholds
 
 By default, the reasoner will use cosine similarity for unification. If you'd like to use a different similarity function, you can pass in a function to the reasoner to perform the similarity calculation however you wish.

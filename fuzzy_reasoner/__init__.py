@@ -2,11 +2,7 @@ __version__ = "0.1.2"
 
 from .prover.SLDProver import SLDProver
 
-from .types.Atom import Atom
-from .types.Constant import Constant
-from .types.Predicate import Predicate
-from .types.Rule import Rule
-from .types.Variable import Variable
+from .types import Atom, Constant, Predicate, Rule, Variable
 
 from .similarity import cosine_similarity, symbol_compare
 
