@@ -47,7 +47,7 @@ bart = Constant("bart", np.array([ ... ]))
 homer = Constant("homer", np.array([ ... ]))
 abe = Constant("abe", np.array([ ... ]))
 
-rules = [
+knowledge = [
     # base facts
     Rule(parent_of(homer, bart)),
     Rule(father_of(abe, homer)),
@@ -55,7 +55,7 @@ rules = [
     Rule(grandpa_of(X, Y), (father_of(X, Z), parent_of(Z, Y)))
 ]
 
-reasoner = SLDReasoner(rules=rules)
+reasoner = SLDReasoner(knowledge=knowledge)
 
 # query the reasoner to find who is bart's grandfather
 proof = reasoner.prove(grandfather_of(X, bart))
@@ -107,13 +107,13 @@ is_male = Predicate("is_male")
 bart = Constant("bart")
 homer = Constant("homer")
 
-rules = [
-    Rule(parent_of(homer, bart)),
-    Rule(is_male(homer)),
+knowledge = [
+    parent_of(homer, bart),
+    is_male(homer),
     Rule(father_of(X, Y), (parent_of(X, Y), is_male(X))),
 ]
 
-prover = SLDProver(rules=rules)
+prover = SLDProver(knowledge=knowledge)
 goal = father_of(homer, X)
 
 proof = prover.prove(goal)
@@ -154,13 +154,13 @@ def fancy_similarity(item1, item2):
     norm = np.linalg.norm(item1.vector) + np.linalg.norm(item2.vector)
     return np.linalg.norm(item1.vector - item2.vector) / norm
 
-reasoner = SLDReasoner(rules=rules, similarity_func=fancy_similarity)
+reasoner = SLDReasoner(knowledge=knowledge, similarity_func=fancy_similarity)
 ```
 
 By default, there is a minimum similarity threshold of `0.5` for a unification to success. You can customize this as well when creating a `SLDReasoner` instance
 
 ```python
-reasoner = SLDReasoner(rules=rules, min_similarity_threshold=0.9)
+reasoner = SLDReasoner(knowledge=knowledge, min_similarity_threshold=0.9)
 ```
 
 ### Max proof depth
@@ -168,7 +168,7 @@ reasoner = SLDReasoner(rules=rules, min_similarity_threshold=0.9)
 By default, the SLDReasoner will abort proofs after a depth of 10. You can customize this behavior by passing `max_proof_depth` when creating the reasoner
 
 ```python
-reasoner = SLDReasoner(rules=rules, max_proof_depth=10)
+reasoner = SLDReasoner(knowledge=knowledge, max_proof_depth=10)
 ```
 
 ## Contributing
