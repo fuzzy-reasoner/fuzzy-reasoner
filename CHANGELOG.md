@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.3.2 (2022-07-23)
+### Fix
+* Manually fixing semantic release ([`ceece39`](https://github.com/chanind/fuzzy-reasoner/commit/ceece39afd1c9a2f97eecae291ce36ea3ad2605f))
+
 ## v0.3.1 (2022-07-23)
 ### Fix
 * Bump to release ([`e54826a`](https://github.com/chanind/fuzzy-reasoner/commit/e54826abf86f9d0ea16888d5c863d2865ea96319))
