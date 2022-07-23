@@ -1,3 +1,4 @@
+import numpy as np
 from fuzzy_reasoner.prover.SLDProver import SLDProver
 from fuzzy_reasoner.types.Constant import Constant
 from fuzzy_reasoner.types.Rule import Rule
@@ -188,7 +189,7 @@ def test_can_solve_for_variable_values() -> None:
     assert prover.prove(grandpa_of(bart, X)) is None
 
 
-def test_prove_all_can_find_multiple_solutions_with() -> None:
+def test_prove_all_can_find_multiple_solutions() -> None:
     X = Variable("X")
     Y = Variable("Y")
     Z = Variable("Z")
@@ -222,3 +223,36 @@ def test_prove_all_can_find_multiple_solutions_with() -> None:
     var_bindings_for_x = {result.variable_bindings[X] for result in results}
     assert abe in var_bindings_for_x
     assert clancy in var_bindings_for_x
+
+
+def test_prove_all_with_multiple_valid_proof_paths() -> None:
+    X = Variable("X")
+    Y = Variable("Y")
+    Z = Variable("Z")
+    grandpa_of = Predicate("grandpa_of")
+    father_of = Predicate("father_of", np.array([0.99, 0.05, 1.07]))
+    dad_of = Predicate("dad_of", np.array([1.0, 0.0, 1.0]))
+    bart = Constant("bart")
+    homer = Constant("homer")
+    abe = Constant("abe")
+
+    grandpa_of_def = Rule(grandpa_of(X, Y), (father_of(X, Z), father_of(Z, Y)))
+
+    knowledge = [
+        # base facts
+        Rule(father_of(homer, bart)),
+        Rule(dad_of(homer, bart)),
+        Rule(father_of(abe, homer)),
+        Rule(dad_of(abe, homer)),
+        # theorems
+        grandpa_of_def,
+    ]
+
+    prover = SLDProver(knowledge=knowledge)
+
+    goal = grandpa_of(X, bart)
+
+    results = prover.prove_all(goal)
+    assert len(results) == 4
+    var_bindings_for_x = [result.variable_bindings[X] for result in results]
+    assert [abe, abe, abe, abe] == var_bindings_for_x
