@@ -125,7 +125,7 @@ def join(
         return [], []
     # no more goals to prove, so every successful proof of the main goal is sufficient
     if len(remaining_goals) == 0:
-        conjunction_nodes = [recursed_proof_nodes]
+        conjunction_nodes = [[n] for n in recursed_proof_nodes]
         return recursed_proof_states, conjunction_nodes
     for recursed_proof_state, recursed_proof_node in zip(
         recursed_proof_states, recursed_proof_nodes
