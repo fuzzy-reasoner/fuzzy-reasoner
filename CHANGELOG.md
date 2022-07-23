@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.3.1 (2022-07-23)
+### Fix
+* Bump to release ([`e54826a`](https://github.com/chanind/fuzzy-reasoner/commit/e54826abf86f9d0ea16888d5c863d2865ea96319))
+
 ## v0.3.0 (2022-04-26)
 ### Feature
 * Renaming vector to embedding and make type more flexible to support tensors ([#7](https://github.com/chanind/fuzzy-reasoner/issues/7)) ([`5186647`](https://github.com/chanind/fuzzy-reasoner/commit/51866476e3508f9313d32f80cbe1ccd267c6f316))
